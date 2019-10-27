@@ -102,6 +102,18 @@ void findE(mpz_t n, mpz_t e, mpz_t l){
 }
 
 int main(){
+	int option;
+	cout << "1. Encrypt " << endl << "2. Decrypt" << endl;
+	cout << "Choose 1 to encrypt 2 to decrypt: ";
+	cin >> option;
+	
+	if ( option == 1){
+		//do the encrypt thing
+	}
+	else{
+		//do the decrypt thing
+	}
+	
 	//declare and init p, q, floor, n, totient, e, d
 	mpz_t p, q, l ,n, tot, e, d, M, C;
 	mpz_inits(p, q, l, n, tot, e, d, M, C, NULL);
