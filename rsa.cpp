@@ -40,7 +40,7 @@ void findTotient(mpz_t p, mpz_t q, mpz_t tot){
 }
 
 void findD(mpz_t d, mpz_t e, mpz_t tot){
-	unsigned long long int i = 1;
+	int i = 1;
 	mpz_t tst, zro;
 		mpz_inits(tst, zro, NULL);
 	mpz_add_ui(tst, tot, 1);
@@ -96,21 +96,25 @@ void encode(mpz_t n, mpz_t e, mpz_t M){
 		if (count == 0){
 			numb = y * pow(93, 2);
 			count += 1;
+			//cout << "numb: " << numb << endl;
 		}
 		
 		else if (count == 1){
 			numb += y * 93;
 			count += 1;
+			//cout << "numb: " << numb << endl;
 		}
 
 		else if (count == 2){
 			numb += y;
 			count = 0;
+			//cout << "numb: " << numb << endl;
 			tri.push_back(numb);
 		}
 	}
 	
 	if (count != 0){
+		//cout <<" just in case numb: " << numb << endl;
 		tri.push_back(numb);
 	}
 
@@ -120,10 +124,15 @@ void encode(mpz_t n, mpz_t e, mpz_t M){
 		mpz_set_ui(temp, tri[i]);
 		mpz_powm(M, temp, e, n);
 		for(int j = 3; j >= 0; j -= 1){
-			mpz_tdiv_q_ui(temp, M, int(pow(93, i)));
+			mpz_out_str(stdout, 10, M);
+			cout << endl;
+			mpz_tdiv_q_ui(temp, M, (int)pow(93, j));
+			//mpz_out_str(stdout, 10, temp);
+			//cout << endl;
 			mpz_mod_ui(temp, temp, 93);
 			mpz_add_ui(temp, temp, 33);
-
+			//mpz_out_str(stdout, 10, temp);
+			//cout << endl;
 			outFile << char(mpz_get_si(temp));
 		}
 	}
@@ -176,11 +185,13 @@ void decode(mpz_t C, mpz_t n, mpz_t d){
 
 		else if (count == 3){
 			mpz_add_ui(temp, temp, y);
+			mpz_out_str(stdout, 10, temp);
+			cout << endl;
 			count = 0;
 			mpz_powm(C, temp, d, n);
 			numb = mpz_get_ui(C);
 			outFile << char((numb / pow(93, 2)) + 33);
-			temp3 = numb /93;
+			temp3 = numb / 93;
 			temp3 = (temp3 % 93) + 33;
 			outFile << char(temp3);
 			outFile << char((numb % 93) + 33);
@@ -194,10 +205,19 @@ int main(){
 	mpz_t p, q, l, n, tot, e, d, M, C, test;
 	mpz_inits(p, q, l, n, tot, e, d, M, C, test, NULL);
 
-	makeprime(p, l, 20, 30);
-	makeprime(q, l, 20, 30);
+	makeprime(p, l, 13, 16);
+	cout << "P: ";
+	mpz_out_str(stdout, 10, p);
+	cout << endl;
+	makeprime(q, l, 13, 16);
+	cout << "Q: ";
+	mpz_out_str(stdout, 10, q);
+	cout << endl;
 	mpz_mul(n, p, q);
 	findTotient(p, q, tot);
+	cout << "tot: ";
+	mpz_out_str(stdout, 10, tot);
+	cout << endl;
 	findE(tot, e, l);
 	findD(d, e, tot);
 	encode(n, e, M);
