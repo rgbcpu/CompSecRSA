@@ -289,10 +289,6 @@ if(choice2 == 1){
 	findTotient(p, q, tot);
 	cout << "Size of E? Start with 2^n ";
 	cin >> esize;
-	makeprime(p, l, 12, 19);
-	makeprime(q, l, 12, 19);
-	mpz_mul(n,p,q);
-	findTotient(p, q, tot);
 	findE(tot, e, l, esize);
 	findD(d, e, tot);
 	cout << endl << endl << endl << "N: ";
