@@ -15,7 +15,7 @@
 //aid in digraph calculation
 using namespace std;
 using namespace std::chrono; 
-
+vector<double>timez;
 string line = "";
 vector<int> quad;
 vector<int> modpush;
@@ -87,14 +87,14 @@ void findD(mpz_t d, mpz_t e, mpz_t tot){
 		}while(mpz_cmp(tst, zro) != 0);
 	}
 }
-void findE(mpz_t tot, mpz_t e, mpz_t l){
+void findE(mpz_t tot, mpz_t e, mpz_t l, int keysize){
 	mpz_t tmp;
 	mpz_inits(tmp, NULL);
-	makeprime(e, l, 6, 14);
+	makeprime(e, l, keysize, keysize+8);
 	mpz_mod(tmp, e, tot);
 	mpz_mod(tmp, e, tot);
 	while(mpz_cmp_ui(tmp, 0) == 0){
-		makeprime(e, l, 6, 14);
+		makeprime(e, l, keysize, keysize+8);
 		mpz_mod(tmp, e, tot);
 	}
 }
@@ -126,10 +126,6 @@ void modAmnt(int type){
 		//mpz_mod_ui(modtwo[i],quoti[i], 2);
 		i++;
 	}while(mpz_get_ui(quoti[i-1]) != 1);
-	for(int j = 0; j < modpush.size(); j++){
-		//mpz_out_str(stdout, 10, modtwo[j]);
-		cout << modpush[j] << " : ";
-	}
 }
 
 void makecipher(vector<int> pass){
@@ -242,6 +238,7 @@ void decipher(){
 
 
 int main(){
+	int primes, esize;
 	for (int j = 0; j < array_size_lg; j++) {
 		mpz_init2(pow2g[j], 1024);
 		mpz_init2(quoti[j], 1024);
@@ -251,11 +248,15 @@ int main(){
 	//mpz_set_ui(n, 34571);
 	//mpz_set_ui(e, 143);
 	//mpz_set_ui(d, 20807);
-int choice = 3;
-cout << "Do you want to time prime generation, or attempt encryption? " << endl << "1. for encrypt, 2. for prime generation ";
+int choice = 3, choice2 = 3;
+cout << "Do you want to time prime generation, or attempt encryption? " << endl << "1. for encrypt, or decrypt and 2. for prime generation ";
 cin >> choice;
 if(choice == 1){
+	choice =0;
+	cout << "Are you trying to encrypt or decrypt? 1 encrypt 2 decrypt ";
+	cin >> choice2;
 	cout << endl;
+if(choice2 == 1){
 	ifstream inFile;
 	long y;
 	vector<int> teest;
@@ -280,26 +281,59 @@ if(choice == 1){
 			numb = 0;
 		}	
 	}
-
-makeprime(p, l, 12, 19);
-makeprime(q, l, 12, 19);
+	cout << "Size of primes? 2^n ";
+	cin >> primes;
+	makeprime(p, l, primes, primes+10);
+	makeprime(q, l, primes, primes+10);
+	mpz_mul(n,p,q);
+	findTotient(p, q, tot);
+	cout << "Size of E? Start with 2^n ";
+	cin >> esize;
+	makeprime(p, l, 12, 19);
+	makeprime(q, l, 12, 19);
+	mpz_mul(n,p,q);
+	findTotient(p, q, tot);
+	findE(tot, e, l, esize);
+	findD(d, e, tot);
+	cout << endl << endl << endl << "N: ";
+	mpz_out_str(stdout, 10, n);
+	cout << endl << endl << endl << "D: ";
+	mpz_out_str(stdout, 10, d);
+	cout << endl << endl << endl << "E: ";
+	mpz_out_str(stdout, 10, e);
+	auto start = high_resolution_clock::now();
+	modAmnt(0);
+	makecipher(teest);
+	auto stop = high_resolution_clock::now();
+	auto duration = duration_cast<microseconds>(stop - start); 
+	cout << endl << "It took " << duration.count() << " microseconds " << "to encrypt ";
+	}
+	else{
+cout << "Size of primes? 2^n ";
+cin >> primes;
+makeprime(p, l, primes, primes+10);
+makeprime(q, l, primes, primes+10);
 mpz_mul(n,p,q);
 findTotient(p, q, tot);
-findE(tot, e, l);
+cout << "Size of E? Start with 2^n ";
+cin >> esize;
+findE(tot, e, l, esize);
 findD(d, e, tot);
 cout << endl << endl << endl << "N: ";
 mpz_out_str(stdout, 10, n);
-cout << endl << endl << endl << "D: ";
-mpz_out_str(stdout, 10, d);
 cout << endl << endl << endl << "E: ";
 mpz_out_str(stdout, 10, e);
+auto start = high_resolution_clock::now();
 modAmnt(1);
-//makecipher(teest);
 decipher();
+auto stop = high_resolution_clock::now();
+auto duration = duration_cast<microseconds>(stop - start); 
+cout << endl << "It took " << duration.count() << " microseconds " << "to decrypt ";
+
+}
 }
 if(choice == 2)
 {
-	vector<double>timez;
 	double total = 0.0;
 	int bound, iterations, count = 1;
 	cout << "Size prime? (Lower bound 2^N) ";
@@ -311,8 +345,8 @@ if(choice == 2)
 	auto start = high_resolution_clock::now(); 
 	makeprime(p, l, bound, bound + 10);
 	auto stop = high_resolution_clock::now(); 
-	auto duration = duration_cast<microseconds>(stop - start); 
-	cout << endl << "It took " << duration.count() << " microseconds " << "for prime " << count;
+	auto duration = duration_cast<milliseconds>(stop - start); 
+	cout << endl << "It took " << duration.count() << " milliseconds " << "for prime " << count;
 	timez.push_back((double)duration.count());
 	//mpz_out_str(stdout, 10, p);
 	count++;
@@ -324,7 +358,7 @@ if(choice == 2)
 	}
 	total = total / count;
 	
-	cout << endl << endl << "Average runtime for " << count << " number generations " <<  total << " microseconds";
+	cout << endl << endl << "Average runtime for " << count << " number generations " <<  total << " millseconds";
 	
 	
 	
