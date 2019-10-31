@@ -11,8 +11,6 @@
 #include <string>
 #include <chrono> 
 
-
-//aid in digraph calculation
 using namespace std;
 using namespace std::chrono; 
 vector<double>timez;
