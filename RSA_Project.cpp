@@ -1,3 +1,9 @@
+/*
+To compile run 
+g++ RSA_Project.cpp -lgmp -lgmpxx
+./a.out
+*/
+
 #include <fstream>
 #include <vector>
 #include <iostream>
